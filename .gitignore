@@ -1,0 +1,5 @@
+/target
+/config.json
+/build
+/node_modules
+/wrangler.toml

@@ -1,0 +1,8 @@
+name = "<YOUR_NAME_GOES_HERE>"
+main = "build/worker/shim.mjs"
+compatibility_date = "2024-04-19"
+compatibility_flags = ["formdata_parser_supports_files"] # required
+
+[build]
+command = "cargo install -q worker-build && worker-build --release" # required
+

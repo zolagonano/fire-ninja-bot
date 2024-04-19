@@ -1,0 +1,7 @@
+{
+    "bot_token": "6250574526:AAFNXpt-utNGEVfprST5gFXmJY3PNkyTv0k",
+
+    "sources": {
+        "mtproto": ["addr"]
+    }
+}
