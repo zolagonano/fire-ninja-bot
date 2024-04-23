@@ -5,11 +5,14 @@ use worker::*;
 
 // TODO: Read Sources from config file
 const MTPROTO_SOURCES: &[&str] = &["https://t.me/s/NextGenProxy", "https://t.me/s/MTP_roto"];
+const SHADOWSOCKS_SOURCES: &[&str] =
+    &["https://raw.githubusercontent.com/barry-far/V2ray-Configs/main/All_Configs_Sub.txt"];
 
 const HELP_MESSAGE: &str = "Fire Ninja Bot allows you to access proxies to bypass firewalls and access blocked content. Currently, only the following commands are available:
 
 - /help: Shows this message.
 - /mtproxy: Fetches and provides a list of MTProto proxies.
+- /shadowsocks: Fetches and provides a list of Shadowsocks proxies.
 ";
 
 async fn fetch_source(source: &str) -> core::result::Result<String, &'static str> {
@@ -60,16 +63,26 @@ async fn main(mut req: Request, _env: Env, _ctx: Context) -> Result<Response> {
                     if let Ok(raw_proxies) = fetch_source(source).await {
                         let proxies = proxy_scraper::Scraper::scrape_mtproxy(&raw_proxies);
                         for proxy in proxies {
-                            proxy_list.insert(format!(
-                                "https://t.me/proxy?server={}&port={}&secret={}",
-                                proxy.host, proxy.port, proxy.secret
-                            ));
+                            proxy_list.insert(proxy.to_url());
                         }
                     }
                 }
                 proxy_list.into_iter().collect::<Vec<_>>().join("\n***\n")
             }
-            "/help" => HELP_MESSAGE.to_string(),
+            "/ss" | "/shadowsocks" => {
+                let mut proxy_list = HashSet::new();
+
+                for source in SHADOWSOCKS_SOURCES {
+                    if let Ok(raw_proxies) = fetch_source(source).await {
+                        let proxies = proxy_scraper::Scraper::scrape_shadowsocks(&raw_proxies);
+                        for proxy in proxies {
+                            proxy_list.insert(proxy.to_url());
+                        }
+                    }
+                }
+                proxy_list.into_iter().collect::<Vec<_>>().join("\n***\n")
+            }
+            "/help" | "/start" => HELP_MESSAGE.to_string(),
             _ => "Invalid command, use /help to get list of available commands.".to_string(),
         };
 
