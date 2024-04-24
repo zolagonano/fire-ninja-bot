@@ -8,9 +8,9 @@ Fire Ninja Bot is a Telegram bot implemented as a Cloudflare Worker. It provides
 - Responds to Telegram commands to provide proxy information.
 - TODO: Support for various types of proxies:
     - [x] MTPROTO
+    - [x] SS
     - [ ] VMESS
     - [ ] VLESS
-    - [ ] SS
     - [ ] SSR
     - [ ] HTTP
     - [ ] HTTPS
