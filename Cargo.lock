@@ -715,7 +715,7 @@ dependencies = [
 [[package]]
 name = "proxy-scraper"
 version = "0.1.0"
-source = "git+https://github.com/zolagonano/proxy-scraper.git?rev=10f0569#10f0569c322d2fb43d735bb75736aaa44fd675b9"
+source = "git+https://github.com/zolagonano/proxy-scraper.git?rev=36b1df3#36b1df36b9a30a759fae258d57e741d531777ef6"
 dependencies = [
  "base64",
  "regex",

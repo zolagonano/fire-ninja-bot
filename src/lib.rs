@@ -63,11 +63,20 @@ async fn main(mut req: Request, _env: Env, _ctx: Context) -> Result<Response> {
                     if let Ok(raw_proxies) = fetch_source(source).await {
                         let proxies = proxy_scraper::Scraper::scrape_mtproxy(&raw_proxies);
                         for proxy in proxies {
-                            proxy_list.insert(proxy.to_url());
+                            proxy_list.insert(format!(
+                                "[Host: {} Port: {}]({})",
+                                proxy.host,
+                                proxy.port,
+                                proxy.to_url()
+                            ));
                         }
                     }
                 }
-                proxy_list.into_iter().collect::<Vec<_>>().join("\n***\n")
+                proxy_list
+                    .into_iter()
+                    .take(15)
+                    .collect::<Vec<_>>()
+                    .join("\n﹌﹌﹌\n")
             }
             "/ss" | "/shadowsocks" => {
                 let mut proxy_list = HashSet::new();
@@ -76,11 +85,15 @@ async fn main(mut req: Request, _env: Env, _ctx: Context) -> Result<Response> {
                     if let Ok(raw_proxies) = fetch_source(source).await {
                         let proxies = proxy_scraper::Scraper::scrape_shadowsocks(&raw_proxies);
                         for proxy in proxies {
-                            proxy_list.insert(proxy.to_url());
+                            proxy_list.insert(format!("`{}`", proxy.to_url()));
                         }
                     }
                 }
-                proxy_list.into_iter().collect::<Vec<_>>().join("\n***\n")
+                proxy_list
+                    .into_iter()
+                    .take(15)
+                    .collect::<Vec<_>>()
+                    .join("\n﹌﹌﹌\n")
             }
             "/help" | "/start" => HELP_MESSAGE.to_string(),
             _ => "Invalid command, use /help to get list of available commands.".to_string(),
@@ -90,6 +103,7 @@ async fn main(mut req: Request, _env: Env, _ctx: Context) -> Result<Response> {
             "method": "sendMessage",
             "chat_id": chat_id,
             "text": response_text,
+            "parse_mode": "Markdown",
         });
 
         return Response::from_json(&response);
