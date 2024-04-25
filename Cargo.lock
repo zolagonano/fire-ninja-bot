@@ -715,10 +715,12 @@ dependencies = [
 [[package]]
 name = "proxy-scraper"
 version = "0.1.0"
-source = "git+https://github.com/zolagonano/proxy-scraper.git?rev=36b1df3#36b1df36b9a30a759fae258d57e741d531777ef6"
+source = "git+https://github.com/zolagonano/proxy-scraper.git?rev=a063310#a063310660057c32f40f853240bb382383d34a57"
 dependencies = [
  "base64",
  "regex",
+ "serde",
+ "serde_json",
  "url",
 ]
 

@@ -8,11 +8,15 @@ const MTPROTO_SOURCES: &[&str] = &["https://t.me/s/NextGenProxy", "https://t.me/
 const SHADOWSOCKS_SOURCES: &[&str] =
     &["https://raw.githubusercontent.com/barry-far/V2ray-Configs/main/All_Configs_Sub.txt"];
 
+const VMESS_SOURCES: &[&str] =
+    &["https://raw.githubusercontent.com/barry-far/V2ray-Configs/main/All_Configs_Sub.txt"];
+
 const HELP_MESSAGE: &str = "Fire Ninja Bot allows you to access proxies to bypass firewalls and access blocked content. Currently, only the following commands are available:
 
 - /help: Shows this message.
 - /mtproxy: Fetches and provides a list of MTProto proxies.
 - /shadowsocks: Fetches and provides a list of Shadowsocks proxies.
+- /vmess: Fetches and provides a list of VMess proxies.
 ";
 
 async fn fetch_source(source: &str) -> core::result::Result<String, &'static str> {
@@ -92,6 +96,23 @@ async fn main(mut req: Request, _env: Env, _ctx: Context) -> Result<Response> {
                 proxy_list
                     .into_iter()
                     .take(15)
+                    .collect::<Vec<_>>()
+                    .join("\n﹌﹌﹌\n")
+            }
+            "/vmess" => {
+                let mut proxy_list = HashSet::new();
+
+                for source in VMESS_SOURCES {
+                    if let Ok(raw_proxies) = fetch_source(source).await {
+                        let proxies = proxy_scraper::Scraper::scrape_vmess(&raw_proxies);
+                        for proxy in proxies {
+                            proxy_list.insert(format!("`{}`", proxy.to_url()));
+                        }
+                    }
+                }
+                proxy_list
+                    .into_iter()
+                    .take(10)
                     .collect::<Vec<_>>()
                     .join("\n﹌﹌﹌\n")
             }
