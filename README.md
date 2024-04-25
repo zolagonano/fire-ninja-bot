@@ -26,6 +26,8 @@ Available commands:
 
 - `/help`: Shows Help message.
 - `/mtproxy`: Fetches and provides a list of available proxies.
+- `/shadowsocks`: Fetches and provides a list of shadowsocks proxies.
+- `/vmess`: Fetches and provides a list of VMess proxies. 
 
 
 ## Setup
