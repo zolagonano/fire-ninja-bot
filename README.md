@@ -11,12 +11,12 @@ Fire Ninja Bot is a Telegram bot implemented as a Cloudflare Worker. It provides
     - [x] SS
     - [x] VMESS
     - [x] VLESS
+    - [x] TROJAN
     - [ ] SSR
     - [ ] HTTP
     - [ ] HTTPS
     - [ ] SOCKS4
     - [ ] SOCKS5
-    - [ ] TROJAN
 
 ## Usage
 
@@ -28,6 +28,8 @@ Available commands:
 - `/mtproxy`: Fetches and provides a list of available proxies.
 - `/shadowsocks`: Fetches and provides a list of shadowsocks proxies.
 - `/vmess`: Fetches and provides a list of VMess proxies. 
+- `/vless`: Fetches and provides a list of VLess proxies. 
+- `/trojan`: Fetches and provides a list of Trojan proxies. 
 
 
 ## Setup
