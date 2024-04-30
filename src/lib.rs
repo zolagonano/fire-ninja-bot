@@ -14,6 +14,9 @@ const VMESS_SOURCES: &[&str] =
 const VLESS_SOURCES: &[&str] =
     &["https://raw.githubusercontent.com/barry-far/V2ray-Configs/main/All_Configs_Sub.txt"];
 
+const TROJAN_SOURCES: &[&str] =
+    &["https://raw.githubusercontent.com/barry-far/V2ray-Configs/main/All_Configs_Sub.txt"];
+
 const HELP_MESSAGE: &str = "Fire Ninja Bot allows you to access proxies to bypass firewalls and access blocked content. Currently, only the following commands are available:
 
 - /help: Shows this message.
@@ -21,6 +24,7 @@ const HELP_MESSAGE: &str = "Fire Ninja Bot allows you to access proxies to bypas
 - /shadowsocks: Fetches and provides a list of Shadowsocks proxies.
 - /vmess: Fetches and provides a list of VMess proxies.
 - /vless: Fetches and provides a list of VLess proxies.
+- /trojan: Fetches and provides a list of Trojan proxies.
 ";
 
 async fn fetch_sources(sources: &[&str]) -> String {
@@ -57,6 +61,7 @@ enum Command {
     Shadowsocks,
     VMess,
     VLess,
+    Trojan,
     Help,
 }
 
@@ -67,9 +72,61 @@ impl Command {
             "/ss" | "/shadowsocks" => Some(Self::Shadowsocks),
             "/vmess" => Some(Self::VMess),
             "/vless" => Some(Self::VLess),
+            "/trojan" => Some(Self::Trojan),
             "/start" | "/help" => Some(Self::Help),
             _ => None,
         }
+    }
+
+    pub fn get_sources(&self) -> &[&str] {
+        match self {
+            Command::MTProxy => MTPROTO_SOURCES,
+            Command::Shadowsocks => SHADOWSOCKS_SOURCES,
+            Command::VMess => VMESS_SOURCES,
+            Command::VLess => VLESS_SOURCES,
+            Command::Trojan => TROJAN_SOURCES,
+            _ => unreachable!(),
+        }
+    }
+
+    pub async fn fetch_and_scrape(&self) -> String {
+        let mut proxy_list = HashSet::new();
+        let raw_proxies = fetch_sources(self.get_sources()).await;
+
+        match self {
+            Command::MTProxy => proxy_scraper::Scraper::scrape_mtproxy(&raw_proxies)
+                .iter()
+                .for_each(|proxy| {
+                    proxy_list.insert(format!("[{}]({})", proxy.to_url(), proxy.to_url()));
+                }),
+            Command::Shadowsocks => proxy_scraper::Scraper::scrape_shadowsocks(&raw_proxies)
+                .iter()
+                .for_each(|proxy| {
+                    proxy_list.insert(format!("`{}`", proxy.to_url()));
+                }),
+            Command::VMess => proxy_scraper::Scraper::scrape_vmess(&raw_proxies)
+                .iter()
+                .for_each(|proxy| {
+                    proxy_list.insert(format!("`{}`", proxy.to_url()));
+                }),
+            Command::VLess => proxy_scraper::Scraper::scrape_vless(&raw_proxies)
+                .iter()
+                .for_each(|proxy| {
+                    proxy_list.insert(format!("`{}`", proxy.to_url()));
+                }),
+            Command::Trojan => proxy_scraper::Scraper::scrape_trojan(&raw_proxies)
+                .iter()
+                .for_each(|proxy| {
+                    proxy_list.insert(format!("`{}`", proxy.to_url()));
+                }),
+            _ => unreachable!(),
+        };
+
+        proxy_list
+            .into_iter()
+            .take(8)
+            .collect::<Vec<_>>()
+            .join("\n﹌﹌﹌\n")
     }
 }
 
@@ -87,69 +144,7 @@ async fn main(mut req: Request, _env: Env, _ctx: Context) -> Result<Response> {
         let text = message.text.to_lowercase();
 
         let response_text = match Command::from_str(text.as_str()) {
-            Some(Command::MTProxy) => {
-                // NOTE: HashSet is used here to deduplicate the proxy links
-                let mut proxy_list = HashSet::new();
-                let raw_proxies = fetch_sources(MTPROTO_SOURCES).await;
-                let proxies = proxy_scraper::Scraper::scrape_mtproxy(&raw_proxies);
-                for proxy in proxies {
-                    proxy_list.insert(format!(
-                        "[Host: {} Port: {}]({})",
-                        proxy.host,
-                        proxy.port,
-                        proxy.to_url()
-                    ));
-                }
-
-                proxy_list
-                    .into_iter()
-                    .take(15)
-                    .collect::<Vec<_>>()
-                    .join("\n﹌﹌﹌\n")
-            }
-            Some(Command::Shadowsocks) => {
-                let mut proxy_list = HashSet::new();
-
-                let raw_proxies = fetch_sources(SHADOWSOCKS_SOURCES).await;
-                let proxies = proxy_scraper::Scraper::scrape_shadowsocks(&raw_proxies);
-                for proxy in proxies {
-                    proxy_list.insert(format!("`{}`", proxy.to_url()));
-                }
-
-                proxy_list
-                    .into_iter()
-                    .take(12)
-                    .collect::<Vec<_>>()
-                    .join("\n﹌﹌﹌\n")
-            }
-            Some(Command::VMess) => {
-                let mut proxy_list = HashSet::new();
-
-                let raw_proxies = fetch_sources(VMESS_SOURCES).await;
-                let proxies = proxy_scraper::Scraper::scrape_vmess(&raw_proxies);
-                for proxy in proxies {
-                    proxy_list.insert(format!("`{}`", proxy.to_url()));
-                }
-                proxy_list
-                    .into_iter()
-                    .take(8)
-                    .collect::<Vec<_>>()
-                    .join("\n﹌﹌﹌\n")
-            }
-            Some(Command::VLess) => {
-                let mut proxy_list = HashSet::new();
-
-                let raw_proxies = fetch_sources(VLESS_SOURCES).await;
-                let proxies = proxy_scraper::Scraper::scrape_vless(&raw_proxies);
-                for proxy in proxies {
-                    proxy_list.insert(format!("`{}`", proxy.to_url()));
-                }
-                proxy_list
-                    .into_iter()
-                    .take(8)
-                    .collect::<Vec<_>>()
-                    .join("\n﹌﹌﹌\n")
-            }
+            Some(command) => command.fetch_and_scrape().await,
             Some(Command::Help) => HELP_MESSAGE.to_string(),
             None => "Invalid command, use /help to get list of available commands.".to_string(),
         };
