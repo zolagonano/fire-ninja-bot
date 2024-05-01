@@ -85,7 +85,7 @@ impl Command {
             Command::VMess => VMESS_SOURCES,
             Command::VLess => VLESS_SOURCES,
             Command::Trojan => TROJAN_SOURCES,
-            _ => unreachable!(),
+            _ => &[""],
         }
     }
 
@@ -119,14 +119,17 @@ impl Command {
                 .for_each(|proxy| {
                     proxy_list.insert(format!("`{}`", proxy.to_url()));
                 }),
-            _ => unreachable!(),
+            _ => (),
         };
 
-        proxy_list
-            .into_iter()
-            .take(8)
-            .collect::<Vec<_>>()
-            .join("\n﹌﹌﹌\n")
+        match self {
+            Command::Help => HELP_MESSAGE.to_string(),
+            _ => proxy_list
+                .into_iter()
+                .take(8)
+                .collect::<Vec<_>>()
+                .join("\n﹌﹌﹌\n"),
+        }
     }
 }
 
@@ -145,7 +148,6 @@ async fn main(mut req: Request, _env: Env, _ctx: Context) -> Result<Response> {
 
         let response_text = match Command::from_str(text.as_str()) {
             Some(command) => command.fetch_and_scrape().await,
-            Some(Command::Help) => HELP_MESSAGE.to_string(),
             None => "Invalid command, use /help to get list of available commands.".to_string(),
         };
 
