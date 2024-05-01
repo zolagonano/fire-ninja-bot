@@ -122,14 +122,20 @@ impl Command {
             _ => (),
         };
 
-        match self {
+        let result = match self {
             Command::Help => HELP_MESSAGE.to_string(),
             _ => proxy_list
                 .into_iter()
                 .take(8)
                 .collect::<Vec<_>>()
                 .join("\n﹌﹌﹌\n"),
+        };
+
+        if result.is_empty() {
+            return "No proxies were found! ".to_string();
         }
+
+        result
     }
 }
 
