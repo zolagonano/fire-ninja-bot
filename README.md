@@ -12,7 +12,9 @@ Fire Ninja Bot is a Telegram bot implemented as a Cloudflare Worker. It provides
     - [x] VMESS
     - [x] VLESS
     - [x] TROJAN
-    - [ ] HYSTERIA2
+    - [x] HYSTERIA1
+    - [x] HYSTERIA2
+    - [x] TUIC
     - [ ] SSR
     - [ ] HTTP
     - [ ] HTTPS
