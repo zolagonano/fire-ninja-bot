@@ -17,6 +17,7 @@ enum Command {
     Hysteria,
     TUIC,
     Help,
+    Support,
 }
 
 impl Command {
@@ -30,6 +31,7 @@ impl Command {
             HYSTERIA_COMMAND => Some(Self::Hysteria),
             TUIC_COMMAND => Some(Self::TUIC),
             START_COMMAND | HELP_COMMAND => Some(Self::Help),
+            SUPPORT_COMMAND => Some(Self::Support),
             _ => None,
         }
     }
@@ -92,6 +94,7 @@ impl Command {
 
         let result = match self {
             Command::Help => HELP_MESSAGE.to_string(),
+            Command::Support => SUPPORT_MESSAGE.to_string(),
             _ => proxy_list
                 .into_iter()
                 .take(8)

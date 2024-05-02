@@ -20,6 +20,7 @@ pub const TUIC_SOURCES: &[&str] =
 pub const HELP_MESSAGE: &str = "Fire Ninja Bot allows you to access proxies to bypass firewalls and access blocked content. Currently, only the following commands are available:
 
 - /help: Shows this message.
+- /support: If you want to keep the project alive.
 - /mtproxy: Fetches and provides a list of MTProto proxies.
 - /shadowsocks: Fetches and provides a list of Shadowsocks proxies.
 - /vmess: Fetches and provides a list of VMess proxies.
@@ -27,6 +28,18 @@ pub const HELP_MESSAGE: &str = "Fire Ninja Bot allows you to access proxies to b
 - /trojan: Fetches and provides a list of Trojan proxies.
 - /hysteria: Fetches and provides a list of Hysteria(version 1 and 2) proxies.
 - /tuic: Fetches and provides a list of TUIC proxies.
+";
+
+pub const SUPPORT_MESSAGE: &str = "
+If you find this bot helpful, please consider donating to keep the project alive, or simply give it a star on my GitHub: 
+
+Monero (XMR): `8AF4Lybz7QwiucdYW2szsgiqTHdBp5kjZSSRm6ddzd5363S6n4jixpkACGMLx5JWZnUR5MnGF7cMoidjppruAvLvMe2ovHZ`
+
+**Ethereum** (And any BEP20 token): `0x9E00DC6bE0d07bDB5Ff8B62593a0193913c9B595`
+
+**TRON** (And any TRC20 token): `TUT762nFQQRoXvDe1Z72p3kKH9uY3XZCg9`
+
+- __Github Repository__: https://github.com/zolagonano/fire-ninja-bot
 ";
 
 pub const INVALID_COMMAND_MESSAGE: &str =
@@ -45,3 +58,4 @@ pub const HYSTERIA_COMMAND: &str = "/hysteria";
 pub const TUIC_COMMAND: &str = "/tuic";
 pub const HELP_COMMAND: &str = "/help";
 pub const START_COMMAND: &str = "/start";
+pub const SUPPORT_COMMAND: &str = "/support";
