@@ -14,6 +14,8 @@ enum Command {
     VMess,
     VLess,
     Trojan,
+    Hysteria,
+    TUIC,
     Help,
 }
 
@@ -25,6 +27,8 @@ impl Command {
             VMESS_COMMAND => Some(Self::VMess),
             VLESS_COMMAND => Some(Self::VLess),
             TROJAN_COMMAND => Some(Self::Trojan),
+            HYSTERIA_COMMAND => Some(Self::Hysteria),
+            TUIC_COMMAND => Some(Self::TUIC),
             START_COMMAND | HELP_COMMAND => Some(Self::Help),
             _ => None,
         }
@@ -37,6 +41,8 @@ impl Command {
             Command::VMess => VMESS_SOURCES,
             Command::VLess => VLESS_SOURCES,
             Command::Trojan => TROJAN_SOURCES,
+            Command::Hysteria => HYSTERIA_SOURCES,
+            Command::TUIC => TUIC_SOURCES,
             _ => &[""],
         }
     }
@@ -67,6 +73,16 @@ impl Command {
                     proxy_list.insert(format!("`{}`", proxy.to_url()));
                 }),
             Command::Trojan => proxy_scraper::Scraper::scrape_trojan(&raw_proxies)
+                .iter()
+                .for_each(|proxy| {
+                    proxy_list.insert(format!("`{}`", proxy.to_url()));
+                }),
+            Command::Hysteria => proxy_scraper::Scraper::scrape_hysteria(&raw_proxies)
+                .iter()
+                .for_each(|proxy| {
+                    proxy_list.insert(format!("`{}`", proxy.to_url()));
+                }),
+            Command::TUIC => proxy_scraper::Scraper::scrape_tuic(&raw_proxies)
                 .iter()
                 .for_each(|proxy| {
                     proxy_list.insert(format!("`{}`", proxy.to_url()));
