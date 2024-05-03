@@ -28,11 +28,14 @@ To use Fire Ninja Bot, simply add it to your Telegram group or chat and interact
 Available commands:
 
 - `/help`: Shows Help message.
+- `/support`: Shows donation URLs.
 - `/mtproxy`: Fetches and provides a list of available proxies.
 - `/shadowsocks`: Fetches and provides a list of shadowsocks proxies.
 - `/vmess`: Fetches and provides a list of VMess proxies. 
 - `/vless`: Fetches and provides a list of VLess proxies. 
 - `/trojan`: Fetches and provides a list of Trojan proxies. 
+- `/hysteria`: Fetches and provides a list of Hysteria(v1 and v2) proxies. 
+- `/tuic`: Fetches and provides a list of TUIC proxies. 
 
 
 ## Setup
