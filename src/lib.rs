@@ -5,6 +5,7 @@ mod utils;
 use crate::config::*;
 use crate::telegram::*;
 use crate::utils::*;
+use proxy_scraper::*;
 use std::collections::HashSet;
 use worker::*;
 
@@ -54,41 +55,37 @@ impl Command {
         let raw_proxies = fetch_sources(self.get_sources()).await;
 
         match self {
-            Command::MTProxy => proxy_scraper::Scraper::scrape_mtproxy(&raw_proxies)
+            Command::MTProxy => mtproxy::MTProxy::scrape(&raw_proxies)
                 .iter()
                 .for_each(|proxy| {
                     proxy_list.insert(format!("[{}]({})", proxy.to_url(), proxy.to_url()));
                 }),
-            Command::Shadowsocks => proxy_scraper::Scraper::scrape_shadowsocks(&raw_proxies)
+            Command::Shadowsocks => shadowsocks::Shadowsocks::scrape(&raw_proxies)
                 .iter()
                 .for_each(|proxy| {
                     proxy_list.insert(format!("`{}`", proxy.to_url()));
                 }),
-            Command::VMess => proxy_scraper::Scraper::scrape_vmess(&raw_proxies)
+            Command::VMess => vmess::VMess::scrape(&raw_proxies).iter().for_each(|proxy| {
+                proxy_list.insert(format!("`{}`", proxy.to_url()));
+            }),
+            Command::VLess => vless::VLess::scrape(&raw_proxies).iter().for_each(|proxy| {
+                proxy_list.insert(format!("`{}`", proxy.to_url()));
+            }),
+            Command::Trojan => trojan::Trojan::scrape(&raw_proxies)
                 .iter()
                 .for_each(|proxy| {
                     proxy_list.insert(format!("`{}`", proxy.to_url()));
                 }),
-            Command::VLess => proxy_scraper::Scraper::scrape_vless(&raw_proxies)
-                .iter()
-                .for_each(|proxy| {
-                    proxy_list.insert(format!("`{}`", proxy.to_url()));
-                }),
-            Command::Trojan => proxy_scraper::Scraper::scrape_trojan(&raw_proxies)
-                .iter()
-                .for_each(|proxy| {
-                    proxy_list.insert(format!("`{}`", proxy.to_url()));
-                }),
-            Command::Hysteria => proxy_scraper::Scraper::scrape_hysteria(&raw_proxies)
-                .iter()
-                .for_each(|proxy| {
-                    proxy_list.insert(format!("`{}`", proxy.to_url()));
-                }),
-            Command::TUIC => proxy_scraper::Scraper::scrape_tuic(&raw_proxies)
-                .iter()
-                .for_each(|proxy| {
-                    proxy_list.insert(format!("`{}`", proxy.to_url()));
-                }),
+            Command::Hysteria => {
+                hysteria::Hysteria::scrape(&raw_proxies)
+                    .iter()
+                    .for_each(|proxy| {
+                        proxy_list.insert(format!("`{}`", proxy.to_url()));
+                    })
+            }
+            Command::TUIC => tuic::TUIC::scrape(&raw_proxies).iter().for_each(|proxy| {
+                proxy_list.insert(format!("`{}`", proxy.to_url()));
+            }),
             _ => (),
         };
 
