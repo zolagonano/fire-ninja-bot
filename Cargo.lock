@@ -634,8 +634,7 @@ dependencies = [
 [[package]]
 name = "proxy-scraper"
 version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ea4356b0cc8c0ff749b96d4a410254322bda874bbf1c9169529ea22ef248ca42"
+source = "git+https://github.com/zolagonano/proxy-scraper?rev=995b195#995b195e2e32fdc91e56d20ee44765c06c837a57"
 dependencies = [
  "base64",
  "regex",
