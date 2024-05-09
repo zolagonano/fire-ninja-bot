@@ -63,24 +63,24 @@ impl Command {
             Command::Shadowsocks => shadowsocks::Shadowsocks::scrape(&raw_proxies)
                 .iter()
                 .for_each(|proxy| {
-                    proxy_list.insert(format!("`{}`", proxy.to_url()));
+                    proxy_list.insert(format!("`{}`", proxy.to_url_pretty()));
                 }),
             Command::VMess => vmess::VMess::scrape(&raw_proxies).iter().for_each(|proxy| {
                 proxy_list.insert(format!("`{}`", proxy.to_url()));
             }),
             Command::VLess => vless::VLess::scrape(&raw_proxies).iter().for_each(|proxy| {
-                proxy_list.insert(format!("`{}`", proxy.to_url()));
+                proxy_list.insert(format!("`{}`", proxy.to_url_pretty()));
             }),
             Command::Trojan => trojan::Trojan::scrape(&raw_proxies)
                 .iter()
                 .for_each(|proxy| {
-                    proxy_list.insert(format!("`{}`", proxy.to_url()));
+                    proxy_list.insert(format!("`{}`", proxy.to_url_pretty()));
                 }),
             Command::Hysteria => {
                 hysteria::Hysteria::scrape(&raw_proxies)
                     .iter()
                     .for_each(|proxy| {
-                        proxy_list.insert(format!("`{}`", proxy.to_url()));
+                        proxy_list.insert(format!("`{}`", proxy.to_url_pretty()));
                     })
             }
             Command::TUIC => tuic::TUIC::scrape(&raw_proxies).iter().for_each(|proxy| {
