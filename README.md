@@ -40,10 +40,99 @@ Available commands:
 
 ## Setup
 
-1. Clone this repository.
-2. Deploy the Cloudflare Worker with your Cloudflare account.
-3. Add the deployed Worker URL as a webhook in your Telegram bot settings.
-4. Interact with your bot on Telegram using the available commands.
+### What You Need
+
+- Rust installed. Download from [rust-lang.org](https://www.rust-lang.org/).
+- Wrangler CLI installed. Install it with this command:
+
+  ```sh
+  npm install -g wrangler
+  ```
+
+- A Cloudflare account. Sign up at [Cloudflare](https://www.cloudflare.com/).
+
+### Setup Steps
+
+1. **Clone the Project**
+
+   Download this project to your computer:
+
+   ```sh
+   git clone https://github.com/yourusername/your-repo-name.git
+   cd your-repo-name
+   ```
+
+2. **Configure Wrangler**
+
+   Log in to your Cloudflare account:
+
+   ```sh
+   wrangler login
+   ```
+
+3. **Update Configuration File**
+
+   Rename `wrangler.toml.sample` to `wrangler.toml`:
+
+   ```sh
+   mv wrangler.toml.sample wrangler.toml
+   ```
+
+   Edit the `wrangler.toml` file to include your Cloudflare account details. It should look like this:
+
+   ```toml
+   name = "your-worker-name"
+   main = "build/worker/shim.mjs"
+   compatibility_date = "2024-04-19"
+   compatibility_flags = ["formdata_parser_supports_files"]
+
+   [build]
+   command = "cargo install -q worker-build && worker-build --release"
+   ```
+
+   Replace `your-worker-name` with the name you want for your worker.
+
+### Deploying the Worker
+
+1. **Deploy to Cloudflare Workers**
+
+   Deploy your worker to Cloudflare with:
+
+   ```sh
+   wrangler publish
+   ```
+
+2. **Access Your Worker**
+
+   After deployment, you can see your worker at:
+
+   ```plaintext
+   https://your-worker-name.your-subdomain.workers.dev
+   ```
+
+   Replace `your-worker-name` and `your-subdomain` with the correct values.
+
+### Telegram Bot Setup
+
+1. **Set Webhooks**
+
+   To use your worker as a Telegram bot, you need to set up webhooks. Use the following URL format to set your webhook:
+
+   ```plaintext
+   https://api.telegram.org/bot<YOUR_BOT_TOKEN>/setWebhook?url=https://your-worker-name.your-subdomain.workers.dev
+   ```
+
+   Replace `<YOUR_BOT_TOKEN>` with your actual bot token, and `your-worker-name` and `your-subdomain` with the correct values.
+
+### Troubleshooting
+
+If you have problems:
+
+- Check that your `wrangler.toml` file is correct.
+- Make sure you are logged in to Cloudflare with `wrangler login`.
+- Verify all dependencies are installed.
+
+For more help, visit the [Cloudflare Workers documentation](https://developers.cloudflare.com/workers/).
 
 ## License
 
