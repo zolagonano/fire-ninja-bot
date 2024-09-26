@@ -4,3 +4,4 @@ config.json
 /node_modules
 wrangler.toml
 BOT_TOKEN.txt
+/.wrangler
