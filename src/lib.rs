@@ -1,14 +1,17 @@
 mod config;
+mod db;
 mod telegram;
 mod utils;
 
 use crate::config::*;
+use crate::db::*;
 use crate::telegram::*;
 use crate::utils::*;
 use proxy_scraper::*;
 use std::collections::HashSet;
 use worker::*;
 
+#[derive(Debug)]
 enum Command {
     MTProxy,
     Shadowsocks,
@@ -18,12 +21,16 @@ enum Command {
     Hysteria,
     TUIC,
     Help,
+    Start,
+    Subscribe(Vec<Command>),
+    Unsubscribe,
     Support,
 }
 
 impl Command {
     pub fn from_str(command: &str) -> Option<Self> {
-        match command {
+        let cmd = command.to_lowercase();
+        match cmd.as_str() {
             MTPROXY_COMMAND => Some(Self::MTProxy),
             SHADOWSOCKS_COMMAND => Some(Self::Shadowsocks),
             VMESS_COMMAND => Some(Self::VMess),
@@ -31,10 +38,32 @@ impl Command {
             TROJAN_COMMAND => Some(Self::Trojan),
             HYSTERIA_COMMAND => Some(Self::Hysteria),
             TUIC_COMMAND => Some(Self::TUIC),
-            START_COMMAND | HELP_COMMAND => Some(Self::Help),
+            HELP_COMMAND => Some(Self::Help),
+            START_COMMAND => Some(Self::Start),
+            UNSUBSCRIBE_COMMAND => Some(Self::Unsubscribe),
+            cmd if cmd.starts_with(SUBSCRIBE_COMMAND) => {
+                Some(Self::Subscribe(Self::containing_proxies(&cmd)))
+            }
             SUPPORT_COMMAND => Some(Self::Support),
             _ => None,
         }
+    }
+
+    pub fn containing_proxies(command: &str) -> Vec<Command> {
+        let mut proxy_commands: Vec<Command> = Vec::new();
+
+        match command {
+            _ if command.contains("mtproxy") => proxy_commands.push(Command::MTProxy),
+            _ if command.contains("shadowsocks") => proxy_commands.push(Command::Shadowsocks),
+            _ if command.contains("vmess") => proxy_commands.push(Command::VMess),
+            _ if command.contains("vless") => proxy_commands.push(Command::VLess),
+            _ if command.contains("trojan") => proxy_commands.push(Command::Trojan),
+            _ if command.contains("hysteria") => proxy_commands.push(Command::Hysteria),
+            _ if command.contains("tuic") => proxy_commands.push(Command::TUIC),
+            _ => {}
+        };
+
+        proxy_commands
     }
 
     pub fn get_sources(&self) -> &[&str] {
@@ -91,6 +120,7 @@ impl Command {
 
         let result = match self {
             Command::Help => HELP_MESSAGE.to_string(),
+            Command::Start => HELP_MESSAGE.to_string(),
             Command::Support => SUPPORT_MESSAGE.to_string(),
             _ => proxy_list
                 .into_iter()
@@ -108,7 +138,7 @@ impl Command {
 }
 
 #[event(fetch)]
-async fn main(mut req: Request, _env: Env, _ctx: Context) -> Result<Response> {
+async fn main(mut req: Request, env: Env, _ctx: Context) -> Result<Response> {
     let update: Result<TelegramUpdate> = req.json().await;
 
     let update = match update {
@@ -120,7 +150,26 @@ async fn main(mut req: Request, _env: Env, _ctx: Context) -> Result<Response> {
         let chat_id = message.chat.id;
         let text = message.text.to_lowercase();
 
+        let db = DB::from_env(env)?;
         let response_text = match Command::from_str(text.as_str()) {
+            command @ Some(Command::Start) => {
+                db.add_new_user(chat_id).await?;
+
+                command.unwrap().fetch_and_scrape().await
+            }
+
+            Some(Command::Subscribe(proxy_types)) => {
+                if proxy_types.is_empty() {
+                    SUBSCRIPTION_FAILED_MESSAGE.to_string()
+                } else {
+                    db.add_new_subscribed_user(chat_id, proxy_types).await?;
+                    SUBSCRIPTION_MESSAGE.to_string()
+                }
+            }
+            Some(Command::Unsubscribe) => {
+                db.del_subscribed_user(chat_id).await?;
+                UNSUBSCRIBE_MESSAGE.to_string()
+            }
             Some(command) => command.fetch_and_scrape().await,
             None => INVALID_COMMAND_MESSAGE.to_string(),
         };
@@ -131,4 +180,28 @@ async fn main(mut req: Request, _env: Env, _ctx: Context) -> Result<Response> {
     }
 
     Response::empty()
+}
+
+#[event(scheduled)]
+async fn main(_event: ScheduledEvent, env: Env, _ctx: ScheduleContext) -> () {
+    let db = DB::from_env(env).unwrap();
+
+    let subscribed_users = db.fetch_subscribed_users().await.unwrap();
+
+    for user in subscribed_users {
+        let subscribed_command = format!("{} {:?}", SUBSCRIBE_COMMAND, user.proxy_types);
+        let subscribed_proxies = Command::from_str(&subscribed_command);
+
+        if let Some(Command::Subscribe(sub_proxies)) = subscribed_proxies {
+            for sub_proxy in sub_proxies {
+                let mut response_text = String::new();
+                response_text.push_str(&format!("SUBSCRIBED {:?} PROXIES:\n\n", sub_proxy));
+                response_text.push_str(&sub_proxy.fetch_and_scrape().await);
+
+                TelegramSendMessage::new_md(user.user_id as i64, response_text)
+                    .send_directly(BOT_TOKEN)
+                    .await;
+            }
+        }
+    }
 }

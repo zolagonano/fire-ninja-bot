@@ -41,4 +41,11 @@ impl TelegramSendMessage {
             "parse_mode": self.parse_mode,
         })
     }
+
+    pub async fn send_directly(&self, token: &str) -> () {
+        let url = format!("https://api.telegram.org/bot{}/sendMessage", token);
+
+        let client = reqwest::Client::new();
+        let _response = client.post(&url).json(&self).send().await.unwrap();
+    }
 }

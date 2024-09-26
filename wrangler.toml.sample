@@ -1,8 +1,16 @@
 name = "<YOUR_NAME_GOES_HERE>"
 main = "build/worker/shim.mjs"
-compatibility_date = "2024-04-19"
-compatibility_flags = ["formdata_parser_supports_files"] # required
+compatibility_date = "2023-04-19"
 
 [build]
 command = "cargo install -q worker-build && worker-build --release" # required
+
+
+[triggers]
+crons = ["30 15 * * *"]
+
+[[d1_databases]]
+binding = "DB_FNB"
+database_name = "fire-ninja-bot"
+database_id = "<YOUR_DATABASE_ID_GOES_HERE>"
 
