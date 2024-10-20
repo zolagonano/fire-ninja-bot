@@ -31,6 +31,9 @@ impl Command {
     pub fn from_str(command: &str) -> Option<Self> {
         let cmd = command.to_lowercase();
         match cmd.as_str() {
+            cmd if cmd.starts_with(SUBSCRIBE_COMMAND) => {
+                Some(Self::Subscribe(Self::containing_proxies(&cmd)))
+            }
             MTPROXY_COMMAND => Some(Self::MTProxy),
             SHADOWSOCKS_COMMAND => Some(Self::Shadowsocks),
             VMESS_COMMAND => Some(Self::VMess),
@@ -41,9 +44,7 @@ impl Command {
             HELP_COMMAND => Some(Self::Help),
             START_COMMAND => Some(Self::Start),
             UNSUBSCRIBE_COMMAND => Some(Self::Unsubscribe),
-            cmd if cmd.starts_with(SUBSCRIBE_COMMAND) => {
-                Some(Self::Subscribe(Self::containing_proxies(&cmd)))
-            }
+
             SUPPORT_COMMAND => Some(Self::Support),
             _ => None,
         }

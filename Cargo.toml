@@ -16,6 +16,6 @@ serde = { version = "1.0.198", features = ["derive"] }
 serde_json = "1.0.116"
 url = "2.5.0"
 worker = { version = "0.2.0", features = ["d1"] }
-proxy-scraper = { git = "https://github.com/zolagonano/proxy-scraper", rev="9517f17" , default-features = false, features = ["scraper"] }
+proxy-scraper = { git = "https://github.com/zolagonano/proxy-scraper", rev="36b34e4" , default-features = false, features = ["scraper"] }
 reqwest = { version = "0.12.3", features = ["json"] }
 
