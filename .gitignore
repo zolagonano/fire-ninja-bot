@@ -5,3 +5,4 @@ config.json
 wrangler.toml
 BOT_TOKEN.txt
 /.wrangler
+.wrangler
